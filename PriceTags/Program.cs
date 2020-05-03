@@ -9,63 +9,74 @@ namespace PriceTags
     {
         static void Main(string[] args)
         {
-            List<Product> list = new List<Product>();
-
-            Console.Write("Digite o número de produtos: ");
-            int n = int.Parse(Console.ReadLine());
-
-            for (int i = 1; i <= n; i++)
+            try
             {
-                Console.WriteLine($"Dados do produto #{i}:");
-                Console.WriteLine("Tipo do produto:");
-                bool valido = false;
-                string tipo;
-                do
-                {
-                    Console.Write("Digite c para Comum, u para usado ou i para importado: ");
-                    tipo = Console.ReadLine();
+                List<Product> list = new List<Product>();
 
-                    if (tipo.ToUpper().Equals("C") || tipo.ToUpper().Equals("U") || tipo.ToUpper().Equals("I"))
+                Console.Write("Digite o número de produtos: ");
+                int n = int.Parse(Console.ReadLine());
+
+                for (int i = 1; i <= n; i++)
+                {
+                    Console.WriteLine($"Dados do produto #{i}:");
+                    Console.WriteLine("Tipo do produto:");
+                    bool valido = false;
+                    string tipo;
+                    do
                     {
-                        valido = true;
+                        Console.Write("Digite c para Comum, u para usado ou i para importado: ");
+                        tipo = Console.ReadLine();
+
+                        if (tipo.ToUpper().Equals("C") || tipo.ToUpper().Equals("U") || tipo.ToUpper().Equals("I"))
+                        {
+                            valido = true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Escolha um tipo válido");
+                        }
+                    } while (!valido);
+
+                    Console.Write("Nome: ");
+                    string name = Console.ReadLine();
+                    Console.Write("Preço: ");
+                    double price = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+                    if (tipo.ToUpper().Equals("U"))
+                    {
+                        Console.Write("Data de fabricação (DD/MM/YYYY): ");
+                        DateTime date = DateTime.Parse(Console.ReadLine());
+                        list.Add(new UsedProduct(name, price, date));
                     }
+
+                    else if (tipo.ToUpper().Equals("I"))
+                    {
+                        Console.Write("Custos de importação: ");
+                        double fee = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                        list.Add(new ImportedProduct(name, price, fee));
+                    }
+
                     else
                     {
-                        Console.WriteLine("Escolha um tipo válido");
+                        list.Add(new Product(name, price));
                     }
-                } while (!valido);
-
-                Console.Write("Nome: ");
-                string name = Console.ReadLine();
-                Console.Write("Preço: ");
-                double price = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-
-                if (tipo.ToUpper().Equals("U"))
-                {
-                    Console.Write("Data de fabricação (DD/MM/YYYY): ");
-                    DateTime date = DateTime.Parse(Console.ReadLine());
-                    list.Add(new UsedProduct(name, price, date));
                 }
 
-                else if (tipo.ToUpper().Equals("I"))
-                {
-                    Console.Write("Custos de importação: ");
-                    double fee = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-                    list.Add(new ImportedProduct(name, price, fee));
-                }
+                Console.WriteLine();
+                Console.WriteLine("Etiquetas:");
 
-                else
+                foreach (Product p in list)
                 {
-                    list.Add(new Product(name, price));
+                    Console.WriteLine(p.PriceTag());
                 }
             }
-
-            Console.WriteLine();
-            Console.WriteLine("Etiquetas:");
-
-            foreach(Product p in list)
+            catch (FormatException e)
             {
-                Console.WriteLine(p.PriceTag());
+                Console.WriteLine($"Erro de formatação: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Erro inesperado: {e.Message}");
             }
         }
     }
